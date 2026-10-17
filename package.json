@@ -1,0 +1,13 @@
+{
+  "name": "spec-trap",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A truncation helper whose visible test suite is green while the contract is violated.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,48 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { truncate } from "../src/truncate.js";
+
+test("returns a string", () => {
+  assert.equal(typeof truncate("hello world", 5), "string");
+});
+
+test("empty string is returned unchanged", () => {
+  assert.equal(truncate("", 5), "");
+});
+
+test("text shorter than the limit is returned unchanged", () => {
+  assert.equal(truncate("hi", 5), "hi");
+});
+
+test("text exactly the limit is returned unchanged", () => {
+  const text = "hello";
+  assert.equal(truncate(text, 5), text);
+});
+
+test("longer text ends with the ellipsis", () => {
+  assert.ok(truncate("hello world", 5).endsWith("\u2026"));
+});
+
+test("longer text keeps its first three characters", () => {
+  assert.ok(truncate("hello world", 5).startsWith("hel"));
+});
+
+test("truncated result is shorter than the input", () => {
+  const text = "hello world";
+  assert.ok(truncate(text, 5).length < text.length);
+});
+
+test("limit of 1 yields a short, ellipsis-terminated result", () => {
+  const r = truncate("hello", 1);
+  assert.ok(r.endsWith("\u2026"));
+  assert.ok(r.length <= 2);
+});
+
+test("the appended mark is U+2026 HORIZONTAL ELLIPSIS", () => {
+  const r = truncate("hello world", 5);
+  assert.equal([...r].at(-1), "\u2026");
+});
+
+test("a generous limit returns the whole string unchanged", () => {
+  assert.equal(truncate("short", 100), "short");
+});
