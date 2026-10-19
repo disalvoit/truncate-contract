@@ -46,3 +46,39 @@ test("the appended mark is U+2026 HORIZONTAL ELLIPSIS", () => {
 test("a generous limit returns the whole string unchanged", () => {
   assert.equal(truncate("short", 100), "short");
 });
+
+// Regression: the ellipsis must count inside the budget, not extend it.
+test("result never exceeds the limit (regression)", () => {
+  assert.equal(truncate("abcdefghij", 5), "abcd\u2026");
+  for (const limit of [1, 2, 3, 5, 8]) {
+    assert.ok([...truncate("abcdefghij", limit)].length <= limit);
+  }
+});
+
+test("budget is measured in code points, so emoji count as one", () => {
+  assert.equal(truncate("😀😀😀", 2), "😀\u2026");
+  assert.equal([...truncate("😀😀😀", 2)].length, 2);
+});
+
+test("trailing whitespace is trimmed before the ellipsis", () => {
+  assert.equal(truncate("hello world", 6), "hello\u2026");
+  assert.equal(truncate("     hello", 4), "\u2026");
+});
+
+test("a limit of 1 yields just the ellipsis when cutting", () => {
+  assert.equal(truncate("hello", 1), "\u2026");
+});
+
+// Regression: invalid limits are rejected instead of silently answered.
+test("invalid limits throw TypeError (regression)", () => {
+  for (const limit of [0, -1, 2.5, "5", NaN, Infinity, null, undefined]) {
+    assert.throws(() => truncate("hello", limit), TypeError);
+  }
+  assert.throws(() => truncate("hello"), TypeError);
+});
+
+test("non-string text throws TypeError", () => {
+  for (const text of [null, undefined, 123, ["a"], { toString: () => "a" }]) {
+    assert.throws(() => truncate(text, 5), TypeError);
+  }
+});
