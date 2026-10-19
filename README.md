@@ -31,3 +31,10 @@ truncate("hello world", 5); // "hell…"
 truncate("hello", 5);       // "hello"
 truncate("😀😀😀", 2);      // "😀…"
 ```
+
+## Held-out grade
+
+`held-out/ep4.test.mjs` is the suite the episode grades against — the tests the
+models never saw. Run it with `node --test held-out/`. On the shipped `main` it
+passes 4 of 20 checks; the contract it grades against is `README.md`, not the
+issue's example.
